@@ -16,6 +16,8 @@ class Invoice {
     private $createdAt;
 
     public function __construct($customerName) {
+        $this->validateName($customerName);
+
         $this->customer = $customerName;
         $this->id = uniqid(); // Not sure if this is the best approach...
         $this->createdAt = date('Y-m-d H:i:s');
