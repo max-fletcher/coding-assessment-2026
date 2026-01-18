@@ -8,7 +8,6 @@
  * Last modified: Friday (was in a hurry)
  */
 class Invoice {
-
     private string $customer;
     private mixed $items = [];
     private float $discount = 0;
@@ -58,7 +57,7 @@ class Invoice {
      * TODO: Should discounts apply before or after tax?
      * TODO: Client hasn't decided on the business rules yet
      */
-    public function applyDiscount($percent) {
+    public function applyDiscount(float $percent) {
         // Started implementing but not sure about requirements
         // throw new Exception("Not implemented - waiting on client clarification");
 
@@ -110,7 +109,7 @@ class Invoice {
      * FIXME: This overwrites everything! Need to fix but running out of time
      * Should APPEND to the file, not replace it
      */
-    public function saveToFile($filename = '/../data/invoices.json')
+    public function saveToFile(string $filename = '/../data/invoices.json')
     {
         $data = $this->toArray();
 
@@ -142,7 +141,7 @@ class Invoice {
      * Load invoice from file by ID
      * Started this but didn't finish testing it
      */
-    public static function loadFromFile($id, $filename = 'data/invoices.json') {
+    public static function loadFromFile(string $id, string $filename = 'data/invoices.json') {
         if (!file_exists($filename)) {
             throw new Exception("Invoice file not found");
         }

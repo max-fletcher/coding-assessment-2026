@@ -18,7 +18,7 @@ class InvoiceCalculator {
      * @param string $region Region code (e.g., "US-CA", "CA-ON")
      * @return float Tax amount
      */
-    public static function calculateTax($subtotal, $region = 'US-CA') {
+    public static function calculateTax(float $subtotal, string $region = 'US-CA') {
         // Read existing file
         $filename = dirname(__DIR__) . '/data/tax_rates.json';
 
@@ -54,7 +54,7 @@ class InvoiceCalculator {
      * @param Invoice $invoice
      * @return Invoice Modified invoice
      */
-    public static function applyBusinessRules($invoice) {
+    public static function applyBusinessRules(Invoice $invoice) {
         // Need to figure out requirements first
 
         // Pseudo-code for what they MIGHT want:
@@ -81,7 +81,7 @@ class InvoiceCalculator {
      * @param array $item Item with price and quantity/qty
      * @return float Line item total
      */
-    public static function calculateLineItem($item) {
+    public static function calculateLineItem(mixed $item) {
         $price = $item['price'];
 
         // Handle both 'quantity' and 'qty' naming
@@ -98,7 +98,7 @@ class InvoiceCalculator {
      * @param float $amount
      * @return string Formatted currency
      */
-    public static function formatCurrency($amount) {
+    public static function formatCurrency(float $amount) {
         return '$' . number_format($amount, 2);
     }
 
@@ -113,7 +113,7 @@ class InvoiceCalculator {
      * - At least one item
      * - etc.
      */
-    public static function validateInvoice($invoice) {
+    public static function validateInvoice(Invoice $invoice) {
         $errors = [];
 
         // TODO: Add actual validation logic

@@ -182,9 +182,6 @@ class InvoiceTest {
         $invoice->addItem("Item 2", 15.00, 3);
         $invoice->addItem("Item 3", 5.00, 1);
 
-        $expected = 20.00 + 45.00 + 5.00; // = 70.00
-        $actual = $invoice->getTotal();
-
         $pdfGenerator = new PDFGenerator();
         $filename = $pdfGenerator->generatePDF($invoice->getId(), $invoice);
 
