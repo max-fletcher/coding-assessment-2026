@@ -1,5 +1,7 @@
 <?php
 
+use Dompdf\Dompdf;
+
 /**
  * PDFGenerator - Generate PDF invoices
  *
@@ -34,11 +36,28 @@ class PDFGenerator {
      * @return string PDF file path or content
      * @throws Exception Currently not implemented
      */
-    public function generatePDF($invoice) {
-        throw new Exception(
-            "PDF generation not implemented. " .
-            "You may now use Composer packages (FPDF, TCPDF, Dompdf, etc.)."
-        );
+
+    private $domPDF;
+
+    public function __construct() {
+        $this->domPDF = new Dompdf();
+    }
+    
+    public function generatePDF(string $customerId, Invoice $invoice) {
+        $html = $this->generateHTML($invoice);
+
+        $this->domPDF->loadHtml($html);
+        // Set paper size and orientation
+        $this->domPDF->setPaper('A4', 'portrait');
+        // Render the HTML as PDF
+        $this->domPDF->render();
+        // Save PDF to file
+        $output = $this->domPDF->output();
+
+        $fileName = '/../Invoice-' . $customerId . '-' . uniqid() . '.pdf';
+        file_put_contents(__DIR__ . $fileName, $output);
+
+        return substr($fileName, 4);
     }
 
     /**
@@ -51,7 +70,7 @@ class PDFGenerator {
      * @param Invoice $invoice
      * @return string HTML content
      */
-    private function generateHTML($invoice) {
+    private function generateHTML(Invoice $invoice) {
         // Basic template - would need styling
         $html = '<html><head><title>Invoice</title></head><body>';
         $html .= '<h1>Invoice #' . $invoice->getId() . '</h1>';
@@ -85,7 +104,7 @@ class PDFGenerator {
      * @param Invoice $invoice
      * @return string HTML file path
      */
-    public function exportHTML($invoice) {
+    public function exportHTML(Invoice $invoice) {
         $html = $this->generateHTML($invoice);
         $filename = 'invoice_' . $invoice->getId() . '.html';
         file_put_contents($filename, $html);
@@ -96,7 +115,7 @@ class PDFGenerator {
      * Attempted to write raw PDF - gave up after 2 hours
      * Keeping this as evidence of how hard this is
      */
-    private function generateRawPDF_ABANDONED($invoice) {
+    private function generateRawPDF_ABANDONED(Invoice $invoice) {
         // PDF header
         // %PDF-1.4
         // Then you need:

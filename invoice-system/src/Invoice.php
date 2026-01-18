@@ -9,13 +9,13 @@
  */
 class Invoice {
 
-    private $customer;
-    private $items = [];
-    private $discount = 0;
-    private $id;
-    private $createdAt;
+    private string $customer;
+    private mixed $items = [];
+    private float $discount = 0;
+    private string $id;
+    private string $createdAt;
 
-    public function __construct($customerName) {
+    public function __construct(string $customerName) {
         $this->validateName($customerName);
 
         $this->customer = $customerName;
@@ -114,15 +114,10 @@ class Invoice {
     {
         $data = $this->toArray();
 
+        // Read existing file
         $filename = dirname(__DIR__) . '/data/test_invoices.json';
 
-        // file_put_contents('debug.log', "Filename: {$filename}\n", FILE_APPEND);
-        // file_put_contents(
-        //     'debug.log',
-        //     "File exists: " . (file_exists($filename) ? 'YES' : 'NO') . "\n",
-        //     FILE_APPEND
-        // );
-
+        // If file exists, convert to PHP array, else, create new array
         if (file_exists($filename)) {
             $existingFileContents = file_get_contents($filename);
             $existingInvoiceData = json_decode($existingFileContents, true) ?? [];
@@ -130,21 +125,10 @@ class Invoice {
             $existingInvoiceData = [];
         }
 
-        // file_put_contents(
-        //     'debug.log',
-        //     "Existing data:\n" . print_r($existingInvoiceData, true) . "\n",
-        //     FILE_APPEND
-        // );
-
+        // Merge arrays
         $appendedDataToExistingIvoiceData = [...$existingInvoiceData, $data];
 
-        // file_put_contents(
-        //     'debug.log',
-        //     "append Existing data:\n" . print_r($appendedDataToExistingIvoiceData, true) . "\n",
-        //     FILE_APPEND
-        // );
-
-        // TEMP: overwrites file
+        // Write/overwrite to file
         file_put_contents(
             $filename,
             json_encode($appendedDataToExistingIvoiceData, JSON_PRETTY_PRINT),
@@ -165,20 +149,6 @@ class Invoice {
 
         $contents = file_get_contents($filename);
         $invoices = json_decode($contents, true);
-
-        // file_put_contents(
-        //     'debug.log',
-        //     print_r($contents, true),
-        //     FILE_APPEND
-        // );
-
-        
-        // file_put_contents(
-        //     'debug.log',
-        //     print_r($invoices, true),
-        //     FILE_APPEND
-        // );
-
 
         // Handle both single invoice and array of invoices
         // (since saveToFile is broken and only saves one)

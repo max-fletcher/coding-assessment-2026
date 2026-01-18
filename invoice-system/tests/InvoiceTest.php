@@ -13,6 +13,7 @@
 require_once __DIR__ . '/../src/Invoice.php';
 require_once __DIR__ . '/../src/InvoiceCalculator.php';
 require_once __DIR__ . '/../src/PDFGenerator.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 class InvoiceTest {
 
@@ -32,6 +33,7 @@ class InvoiceTest {
         $this->test_add_multiple_items();
         $this->test_save_and_load();
         $this->test_tax_calculation();
+        $this->test_PDF_generation();
 
         echo "\n" . str_repeat("=", 50) . "\n";
         echo "Tests Passed: " . $this->testsPassed . "\n";
@@ -96,6 +98,8 @@ class InvoiceTest {
 
         $expected = 20.00 + 45.00 + 5.00; // = 70.00
         $actual = $invoice->getTotal();
+
+        $pdfGenerator = new PDFGenerator();
 
         $this->assert(
             $actual === $expected,
@@ -163,13 +167,31 @@ class InvoiceTest {
         $subtotal = 100.00;
         $tax = InvoiceCalculator::calculateTax($subtotal, 'US-CA');
 
-        // Hardcoded to 10% currently
-        $expected = 10.00;
+        $expected = 7.25;
 
         $this->assert(
-            $tax === $expected,
+            $tax == $expected,
             "test_tax_calculation",
-            "Tax should be $10.00, got $" . number_format($tax, 2)
+            "Tax should be $7.25, got $" . number_format($tax, 2)
+        );
+    }
+
+    private function test_PDF_generation() {
+        $invoice = new Invoice("Test Customer");
+        $invoice->addItem("Item 1", 10.00, 2);
+        $invoice->addItem("Item 2", 15.00, 3);
+        $invoice->addItem("Item 3", 5.00, 1);
+
+        $expected = 20.00 + 45.00 + 5.00; // = 70.00
+        $actual = $invoice->getTotal();
+
+        $pdfGenerator = new PDFGenerator();
+        $filename = $pdfGenerator->generatePDF($invoice->getId(), $invoice);
+
+        $this->assert(
+            file_get_contents($filename),
+            "test_PDF_generation",
+            "Generate PDF and test if the file exists or not"
         );
     }
 
