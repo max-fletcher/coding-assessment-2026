@@ -42,7 +42,7 @@ class Invoice {
         $total = 0;
         foreach ($this->items as $item) {
             // Accessing 'quantity' but we stored it as 'qty'!
-            $total += $item['price'] * $item['quantity'];
+            $total += $item['price'] * $item['qty'];
         }
         return $total - $this->discount;
     }
@@ -104,15 +104,47 @@ class Invoice {
      * FIXME: This overwrites everything! Need to fix but running out of time
      * Should APPEND to the file, not replace it
      */
-    public function saveToFile($filename = 'data/invoices.json') {
+    public function saveToFile($filename = '/../data/invoices.json')
+    {
         $data = $this->toArray();
 
-        // This is wrong - overwrites the whole file!
-        // Should load existing invoices and append
-        // But json_encode is easier for now...
-        file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
+        $filename = dirname(__DIR__) . '/data/test_invoices.json';
 
-        // TODO: Fix this before client demo!
+        // file_put_contents('debug.log', "Filename: {$filename}\n", FILE_APPEND);
+        // file_put_contents(
+        //     'debug.log',
+        //     "File exists: " . (file_exists($filename) ? 'YES' : 'NO') . "\n",
+        //     FILE_APPEND
+        // );
+
+        if (file_exists($filename)) {
+            $existingFileContents = file_get_contents($filename);
+            $existingInvoiceData = json_decode($existingFileContents, true) ?? [];
+        } else {
+            $existingInvoiceData = [];
+        }
+
+        // file_put_contents(
+        //     'debug.log',
+        //     "Existing data:\n" . print_r($existingInvoiceData, true) . "\n",
+        //     FILE_APPEND
+        // );
+
+        $appendedDataToExistingIvoiceData = [...$existingInvoiceData, $data];
+
+        // file_put_contents(
+        //     'debug.log',
+        //     "append Existing data:\n" . print_r($appendedDataToExistingIvoiceData, true) . "\n",
+        //     FILE_APPEND
+        // );
+
+        // TEMP: overwrites file
+        file_put_contents(
+            $filename,
+            json_encode($appendedDataToExistingIvoiceData, JSON_PRETTY_PRINT),
+            LOCK_EX
+        );
+
         return true;
     }
 
@@ -128,11 +160,27 @@ class Invoice {
         $contents = file_get_contents($filename);
         $invoices = json_decode($contents, true);
 
+        // file_put_contents(
+        //     'debug.log',
+        //     print_r($contents, true),
+        //     FILE_APPEND
+        // );
+
+        
+        // file_put_contents(
+        //     'debug.log',
+        //     print_r($invoices, true),
+        //     FILE_APPEND
+        // );
+
+
         // Handle both single invoice and array of invoices
         // (since saveToFile is broken and only saves one)
         if (isset($invoices['id'])) {
             $invoices = [$invoices];
         }
+
+        // echo($invoices);
 
         foreach ($invoices as $invoiceData) {
             if ($invoiceData['id'] == $id) {
@@ -141,8 +189,9 @@ class Invoice {
                 $invoice->discount = $invoiceData['discount'];
 
                 foreach ($invoiceData['items'] as $item) {
+                    // echo($item);
                     // This might break because of the qty/quantity issue
-                    $qty = isset($item['quantity']) ? $item['quantity'] : $item['qty'];
+                    $qty = $item['qty'];
                     $invoice->addItem($item['name'], $item['price'], $qty);
                 }
 

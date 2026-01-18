@@ -78,7 +78,7 @@ class InvoiceTest {
         $this->assert(
             $actual === $expected,
             "test_calculate_total",
-            "Total should be $20.00, got $" . number_format($actual, 2)
+            "Total should be $20.00, got $" . number_format($actual, 2),
         );
     }
 
@@ -124,7 +124,7 @@ class InvoiceTest {
         $invoice1->addItem("Item A", 100.00, 1);
         $invoice1->saveToFile($testFile);
 
-        // Create and save second invoice
+        // // Create and save second invoice
         $invoice2 = new Invoice("Customer 2");
         $invoice2->addItem("Item B", 200.00, 1);
         $invoice2->saveToFile($testFile);
