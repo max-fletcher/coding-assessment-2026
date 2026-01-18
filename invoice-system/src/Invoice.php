@@ -17,7 +17,7 @@ class Invoice {
 
     public function __construct($customerName) {
         $this->customer = $customerName;
-        $this->id = time(); // Not sure if this is the best approach...
+        $this->id = uniqid(); // Not sure if this is the best approach...
         $this->createdAt = date('Y-m-d H:i:s');
     }
 
@@ -25,7 +25,11 @@ class Invoice {
      * Add an item to the invoice
      * Note: Make sure to use consistent naming!
      */
-    public function addItem($name, $price, $quantity) {
+    public function addItem(string $name, float $price, int $quantity): void{
+        $this->validateName($name);
+        $this->validatePrice($price);
+        $this->validateQuantity($quantity);
+
         // No validation yet - add later?
         $this->items[] = [
             'name' => $name,
@@ -200,5 +204,26 @@ class Invoice {
         }
 
         throw new Exception("Invoice not found: " . $id);
+    }
+
+    private function validateName(string $name): void{
+        if(gettype($name) != 'string')
+            throw new Exception('Name has to be a string');
+
+        return;
+    }
+
+    private function validatePrice(float $price): void {
+        if($price < 0)
+            throw new Exception('Price cannot be less than zero');
+
+        return;
+    }
+
+    private function validateQuantity(int $quantity): void {
+        if($quantity < 0)
+            throw new Exception('Quantity cannot be less than zero');
+
+        return;
     }
 }
